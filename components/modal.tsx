@@ -1,0 +1,8 @@
+'use client';
+import { useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
+export default function Modal({ children, onClose, title }: { children: React.ReactNode; onClose: () => void; title: string }) {
+ const ref = useRef<HTMLDivElement>(null);
+ useEffect(() => { const previous = document.activeElement as HTMLElement; const overflow = document.body.style.overflow; document.body.style.overflow = 'hidden'; ref.current?.querySelector<HTMLButtonElement>('button')?.focus(); function key(e: KeyboardEvent) { if(e.key === 'Escape') onClose(); if(e.key === 'Tab') { const elements = ref.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input,select,textarea,a[href]'); if(!elements?.length) return; const first = elements[0], last = elements[elements.length - 1]; if(e.shiftKey && document.activeElement === first) {e.preventDefault();last.focus();} else if(!e.shiftKey && document.activeElement === last) {e.preventDefault();first.focus();} } } document.addEventListener('keydown',key); return () => {document.body.style.overflow = overflow;document.removeEventListener('keydown',key);previous?.focus();}; },[onClose]);
+ return <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/50 p-4 backdrop-blur-sm" onClick={e => e.target === e.currentTarget && onClose()}><div ref={ref} role="dialog" aria-modal="true" aria-label={title} className="relative max-h-[90dvh] w-full max-w-3xl overflow-auto rounded-2xl bg-surface"><button aria-label="Close dialog" onClick={onClose} className="absolute right-4 top-4 z-10 rounded-full bg-white p-2 shadow-sm"><X size={18} /></button>{children}</div></div>;
+}
